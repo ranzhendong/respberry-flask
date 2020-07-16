@@ -1,7 +1,8 @@
 from flask import Flask
 import paho.mqtt.client as mqtt
 import json
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
+import gpio4.GPIO as GPIO
 
 app = Flask(__name__)
 app.config.from_object("config")
