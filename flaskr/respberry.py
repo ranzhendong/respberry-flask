@@ -11,10 +11,7 @@ app.config.from_object("config")
 def hello_world():
     return 'Hello, World!'
 
-if __name__ == '__main__':
-    app.run()
-
-Host = "emqx.eguagua.cn"
+Host = "emqx.ranzhendong.com.cn"
 Port = 1883
 bedroom = 35
 ch = 26
@@ -49,6 +46,5 @@ if __name__ == "__main__":
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
-    client.username_pw_set(username='zhendong', password='zhendong')
     client.connect(Host, Port, 300)
     client.loop_forever()
