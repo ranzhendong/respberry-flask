@@ -14,6 +14,9 @@ monotonic==1.5
 numpy==1.19.0
 opencv-python==4.1.1.26
 paho-mqtt==1.5.0
+picamera==1.13
+pyparsing==2.4.7
+RPi.GPIO==0.7.0
 RPi.GPIO-def==0.2
 six==1.15.0
 Werkzeug==1.0.1
