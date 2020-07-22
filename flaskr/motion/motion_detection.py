@@ -16,6 +16,8 @@ class Motion:
         self.conf = conf
         self.camera = camera
         self.rawCapture = rawCapture
+        self.time_zone = None
+        self.scheduler_id = "Motion"
 
     def cameraMain(self):
         avg = None
@@ -24,6 +26,7 @@ class Motion:
         conf = self.conf
         camera = self.camera
         rawCapture = self.rawCapture
+        picture_path = conf["picture_path"]
         for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
             second = time.time()
@@ -75,10 +78,11 @@ class Motion:
                 if (timestamp - lastUploaded).seconds >= conf["min_upload_seconds"]:
                     motionCounter += 1
                     if motionCounter >= conf["min_motion_frames"]:
-                        cv2.imwrite("/root/graduation_design/warning/Motion/picture/warining_%s.png" % time_zone, frame)
+                        cv2.imwrite(picture_path + "/warining_%s.png" % time_zone, frame)
                         print("咦。。。好像有人哎。。。")
                         lastUploaded = timestamp
                         motionCounter = 0
+                        self.time_zone = time_zone
             else:
                 motionCounter = 0
             rawCapture.truncate(0)
@@ -97,4 +101,5 @@ if __name__ == "__main__":
 
     print("[INFO] Picamera Is Waking Up......")
     time.sleep(conf["camera_warmup_time"])
-    Motion.cameraMain(conf, camera, rawCapture)
+    m = Motion(conf, camera, rawCapture)
+    m.cameraMain()
