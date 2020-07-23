@@ -82,16 +82,18 @@ class scheduler_motion:
         now = now + datetime.timedelta(seconds=10)
         now = now.strftime("%Y-%m-%d %H:%M:%S")
         print("scheduler will start at", now)
+        client.loop_forever()
+        scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
 
-        if p == 0:
-            time.sleep(10)
-            scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
-            print("执行子进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
-        else:
-            time.sleep(5)
-            client.loop_forever()
-            self.scheduler = scheduler
-            print("执行主进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
+        # if p == 0:
+        #     time.sleep(10)
+        #     scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
+        #     print("执行子进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
+        # else:
+        #     time.sleep(5)
+        #     client.loop_forever()
+        #     self.scheduler = scheduler
+        #     print("执行主进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
 
     def startMotion(self, client):
         print("startMotion")
