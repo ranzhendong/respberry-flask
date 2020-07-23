@@ -51,6 +51,14 @@ def closeLight():
 
 class scheduler_motion:
     def __init__(self):
+
+        p = os.fork()
+        print(".....")
+        client = mqtt.Client()
+        client.on_connect = self.on_connect
+        client.on_message = self.on_message
+        client.connect(Host, Port, 300)
+
         with open("./motion/conf.json", "r", encoding="utf8") as fp:
             json_data = json.load(fp)
             print("获取json数据：", json_data)
@@ -76,16 +84,17 @@ class scheduler_motion:
         now = now + datetime.timedelta(seconds=10)
         now = now.strftime("%Y-%m-%d %H:%M:%S")
         print("scheduler will start at", now)
-        scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
+
+        if p == 0:
+            time.sleep(3)
+            client.loop_forever()
+            print("执行子进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
+        else:
+            time.sleep(1)
+            scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
+            print("执行主进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
 
         self.scheduler = scheduler
-
-        print(".....")
-        client = mqtt.Client()
-        client.on_connect = self.on_connect
-        client.on_message = self.on_message
-        client.connect(Host, Port, 300)
-        client.loop_forever()
 
     def startMotion(self, client):
         print("startMotion")
