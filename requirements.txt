@@ -1,3 +1,6 @@
+aliyun-python-sdk-core==2.13.24
+aliyun-python-sdk-core-v3==2.13.11
+aliyun-python-sdk-kms==2.11.0
 apscheduler==3.6.3
 click==7.1.2
 dnspython==2.0.0
@@ -14,6 +17,7 @@ MarkupSafe==1.1.1
 monotonic==1.5
 numpy==1.19.0
 opencv-python==4.1.1.26
+oss2==2.12.1
 paho-mqtt==1.5.0
 picamera==1.13
 pyparsing==2.4.7
@@ -23,3 +27,4 @@ six==1.15.0
 Werkzeug==1.0.1
 zope.event==4.4
 zope.interface==5.1.0
+requests==2.24.0
