@@ -76,11 +76,11 @@ class scheduler_motion:
         now = now + datetime.timedelta(seconds=10)
         now = now.strftime("%Y-%m-%d %H:%M:%S")
         print("scheduler will start at", now)
-        # scheduler.add_job(closeLight, id="Motion", trigger="date", run_date=now)
         scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
 
         self.scheduler = scheduler
 
+        print(".....")
         client = mqtt.Client()
         client.on_connect = self.on_connect
         client.on_message = self.on_message
