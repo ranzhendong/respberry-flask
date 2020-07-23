@@ -29,14 +29,14 @@ GPIO.setwarnings(False)
 # Pin status is set to output
 GPIO.setup(Light, GPIO.OUT)
 
-# flask
-app = Flask(__name__)
-app.config.from_object("config")
-
-
-@app.route("/")
-def hello_world():
-    return "Hello, World!"
+# # flask
+# app = Flask(__name__)
+# app.config.from_object("config")
+#
+#
+# @app.route("/")
+# def hello_world():
+#     return "Hello, World!"
 
 
 # Set the pin to low level
