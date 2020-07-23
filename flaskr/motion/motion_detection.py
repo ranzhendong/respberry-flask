@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-
+import oss2
+import requests
+import urllib3
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import argparse
-import warnings
 import datetime
 import imutils
 import json
@@ -18,6 +19,21 @@ class Motion:
         self.rawCapture = rawCapture
         self.time_zone = None
         self.scheduler_id = "Motion"
+
+    def ding(self, Subject, Content):
+        urllib3.disable_warnings()
+        # requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+        Url = "https://oapi.dingtalk.com/robot/send?access_token=788c2914731c64911b887d3f2b583d68ce6f9a5d0d6d2daa4a404e4d88ed3c1f"
+
+        Header = {"Content-Type": "application/json", "Charset": "UTF-8"}
+
+        Data = {
+            "msgtype": "markdown",
+            "markdown": {"title": Subject, "text": Content,},
+        }
+        r = requests.post(url=Url, data=json.dumps(Data), headers=Header, verify=False)
+        return r.text
 
     def cameraMain(self):
         avg = None
@@ -78,11 +94,22 @@ class Motion:
                 if (timestamp - lastUploaded).seconds >= conf["min_upload_seconds"]:
                     motionCounter += 1
                     if motionCounter >= conf["min_motion_frames"]:
-                        cv2.imwrite(picture_path + "/warining_%s.png" % time_zone, frame)
+                        ts = "warining_%s.png" % time_zone
+                        picture = picture_path + ts
+                        cv2.imwrite(picture, frame)
                         print("咦。。。好像有人哎。。。")
                         lastUploaded = timestamp
                         motionCounter = 0
                         self.time_zone = time_zone
+                        auth = oss2.Auth("LTAI4GHxymRvbWRDgWhFz8jy", "d2wJq9d01S2LDS1KN9rzxqBpsNiRMl")
+                        # Endpoint以杭州为例，其它Region请按实际情况填写。
+                        osshost = "http://oss-cn-hangzhou.aliyuncs.com"
+                        bucket = oss2.Bucket(auth, osshost, "cv2raspberry")
+                        bucket.put_object_from_file(ts, picture)
+                        time.sleep(4)
+                        p = osshost + "/" + ts
+                        Subject = "OpenCV Notice！"
+                        self.ding(Subject, Content="#### OpenCV Notice \n > ![screenshot](%s)" % p)
             else:
                 motionCounter = 0
             rawCapture.truncate(0)

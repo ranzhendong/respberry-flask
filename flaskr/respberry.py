@@ -13,7 +13,6 @@ from apscheduler.jobstores.memory import MemoryJobStore
 from flaskr.motion.motion_detection import Motion
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-from flask import Flask
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
@@ -37,7 +36,6 @@ GPIO.setup(Light, GPIO.OUT)
 # @app.route("/")
 # def hello_world():
 #     return "Hello, World!"
-
 
 # Set the pin to low level
 def openLight():
@@ -87,11 +85,11 @@ class scheduler_motion:
 
         if p == 0:
             time.sleep(10)
-            client.loop_forever()
+            scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
             print("执行子进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
         else:
             time.sleep(5)
-            scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
+            client.loop_forever()
             self.scheduler = scheduler
             print("执行主进程, pid={} ppid={} p={}".format(os.getpid(), os.getppid(), p))
 
