@@ -81,6 +81,12 @@ class scheduler_motion:
 
         self.scheduler = scheduler
 
+        client = mqtt.Client()
+        client.on_connect = self.on_connect
+        client.on_message = self.on_message
+        client.connect(Host, Port, 300)
+        client.loop_forever()
+
     def startMotion(self, client):
         print("startMotion")
         self.scheduler.resume_job(job_id="Motion")
@@ -113,15 +119,9 @@ class scheduler_motion:
 print("emqx.ranzhendong.com.cn ready to connect ! ")
 sm = scheduler_motion()
 sm.scheduler.add_job(closeLight, id="Motions")
-client = mqtt.Client()
 print(sm.scheduler)
 sm.scheduler.start()
 print(sm.scheduler.get_jobs())
 sm.scheduler.pause_job(job_id="Motion")
-
-client.on_connect = sm.on_connect
-client.on_message = sm.on_message
-client.connect(Host, Port, 300)
-client.loop_forever()
 
 # client.publish("emqtt", payload="Hello World", qos=0)
