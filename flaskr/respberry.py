@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
+import datetime
+import json
 import os
 import sys
 import time
 
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
-
-# from picamera.array import PiRGBArray
-# from picamera import PiCamera
+from apscheduler.jobstores.memory import MemoryJobStore
+from flaskr.motion.motion_detection import Motion
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 from flask import Flask
-
-# from flaskr.motion.motion_detection import Motion
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 
@@ -49,17 +49,19 @@ def closeLight():
 
 class scheduler_motion:
     def __init__(self):
-        conf = {}
-        # camera = PiCamera()
-        # camera.resolution = tuple(conf["resolution"])
-        # camera.framerate = conf["fps"]
-        # rawCapture = PiRGBArray(camera, size=tuple(conf["resolution"]))
+        with open("./motion/conf.json", "r", encoding="utf8") as fp:
+            json_data = json.load(fp)
+            print("获取json数据：", json_data)
+        conf = json_data
+        camera = PiCamera()
+        camera.resolution = tuple(conf["resolution"])
+        camera.framerate = conf["fps"]
+        rawCapture = PiRGBArray(camera, size=tuple(conf["resolution"]))
 
         print("[INFO] Picamera Is Waking Up......")
-        # time.sleep(conf["camera_warmup_time"])
+        time.sleep(conf["camera_warmup_time"])
 
-        # m = Motion(conf, camera, rawCapture)
-        # m = Motion(conf, "camera", "rawCapture")
+        m = Motion(conf, camera, rawCapture)
 
         jobstores = {"default": MemoryJobStore()}
 
@@ -68,15 +70,21 @@ class scheduler_motion:
         job_defaults = {"coalesce": False, "max_instances": 3}
 
         scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults)
-        # scheduler.add_job(m.cameraMain(), "interval", minutes=2, id="Motion")
-        scheduler.add_job(closeLight, id="Motion")
+        now = datetime.datetime.now()
+        now = now + datetime.timedelta(seconds=10)
+        now = now.strftime("%Y-%m-%d %H:%M:%S")
+        print("scheduler will start at", now)
+        # scheduler.add_job(closeLight, id="Motion", trigger="date", run_date=now)
+        scheduler.add_job(m.cameraMain(), id="Motion", trigger="date", run_date=now)
 
         self.scheduler = scheduler
 
-    def startMotion(self):
+    def startMotion(self, client):
+        print("startMotion")
         self.scheduler.resume_job(job_id="Motion")
 
     def stopMotion(self):
+        print("stopMotion")
         self.scheduler.pause_job(job_id="Motion")
 
     # Subscribe topic respberry
@@ -93,7 +101,7 @@ class scheduler_motion:
         elif signal == "2":
             closeLight()
         elif signal == "3":
-            self.startMotion()
+            self.startMotion(client)
         elif signal == "4":
             self.stopMotion()
         elif signal == "5":
