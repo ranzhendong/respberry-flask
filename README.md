@@ -1,11 +1,18 @@
 # respberry-flask
 
-这个项目是需要在树莓派端启动的，用于订阅emqx消息，根据消息的不同，作出不同的动作。
+不要被这个名称吓坏了，在后面的更新当中，把flask框架去掉了，里面目前只是包含了mqtt库以及apschedule库。
+
+这个项目包含远程GPIO控制+运动物体检测。
+
+- 在树莓派端启动。
+- 树莓派摄像头。
+- python3.7。
+- opencv。
 
 ## 环境
 
-- python3.7
-- emqx部署
+- emqx服务器。
+- opencv最新版本源码编译。
 
 ## 下载源码
 
@@ -28,11 +35,11 @@ python -m venv venv
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
-## 启动flask
+## 启动
 
-需要在flaskr文件夹下面启动，默认读取config.py配置文件
+需要在flaskr文件夹下面启动。
 
 ```shell script
-gunicorn -c config.py respberry:app
+python respberry.py
 ```
 
